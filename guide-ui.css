@@ -1,0 +1,4 @@
+.caption .caption-friend { width:42px; height:42px; flex:0 0 42px; filter:drop-shadow(0 2px 0 #c6b5ca66); }
+.caption p::before { content:'星朵 · 独角兽向导'; display:block; color:#9a7c9f; font-size:10px; font-weight:600; letter-spacing:.025em; margin-bottom:3px; }
+.lesson-guide { position:absolute; top:10px; left:12px; width:30px; height:30px; }
+@media(max-width:360px) { .caption .caption-friend { width:32px; height:32px; flex-basis:32px; } .caption p::before { font-size:9px; } }

@@ -1,0 +1,38 @@
+[
+  {
+    "key": "done-l01-next",
+    "group": "voice",
+    "expected": "太棒啦！字母星球完成啦！寻宝星球亮起来了，点它就能飞过去。",
+    "transcript": "太棒了,自母星球完成了,尋寶星球亮起来了,点它就能飞过去。",
+    "normalized_match": false,
+    "homophone_match": false,
+    "status": "review",
+    "sha256": "d4845da2cd66f3ba97ab3dd1e2de77182207a2422684562967bc4a8908251fd3",
+    "model": "Systran/faster-whisper-small",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  },
+  {
+    "key": "done-l02",
+    "group": "voice",
+    "expected": "太棒啦！寻宝星球完成啦！猫星球亮起来了，点它就能飞过去。",
+    "transcript": "太棒了,尋寶星球完成了。猫星球亮起来了,点它就能飞过去。",
+    "normalized_match": false,
+    "homophone_match": false,
+    "status": "review",
+    "sha256": "804cc39e7a7b40452be018f55b0ab356ab0a22734e021c91aa4a41e5a77e7842",
+    "model": "Systran/faster-whisper-small",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  },
+  {
+    "key": "reward-dog",
+    "group": "voice",
+    "expected": "一只小狗跑出来啦！它会陪你一起探险。",
+    "transcript": "一隻小狗跑出來了,他會陪你一起探險。",
+    "normalized_match": false,
+    "homophone_match": false,
+    "status": "review",
+    "sha256": "fc23b5850c3c56010a22c55b138a8946361aacc7164ea5f62725a0d71d8ef6db",
+    "model": "Systran/faster-whisper-small",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  }
+]

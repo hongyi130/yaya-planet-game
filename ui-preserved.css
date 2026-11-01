@@ -1,0 +1,341 @@
+/* v55 游戏的软陶 UI 皮肤。只覆盖界面；星空、圆球及游戏状态仍由原版负责。 */
+:root {
+  --ink: #665477;
+  --paper: #fffdf5;
+  --milk: #fffdf5;
+  --mint: #78bca2;
+  --honey: #f7c65d;
+  --berry: #675179;
+  --pink: #efb4aa;
+  --ui-panel-shadow: 0 6px 0 #cbbfc5, 0 13px 26px rgba(20, 15, 44, .2);
+  --ui-slot-size: clamp(44px, calc((100vw - 84px) / 6), 58px);
+  --ui-dock-bottom: 20px;
+}
+
+button { -webkit-appearance: none; appearance: none; touch-action: manipulation; }
+button:focus-visible { outline: 3px solid #8d66a4; outline-offset: 4px; }
+button:disabled { cursor: default; }
+.ui-icon, .ui-icon *, .chip-mark, .chip-mark *, .planet-mascot, .planet-mascot *,
+.howto-icon, .howto-icon *, .caption-friend, .caption-friend * { pointer-events: none; }
+.ui-icon, .chip-mark, .planet-mascot, .howto-icon, .caption-friend { display: block; flex: none; }
+
+/* 小芽铭牌、奶油按钮和蜜糖星币，使用同一套高光与侧壁。 */
+.hud-top { z-index: 5; top: calc(env(safe-area-inset-top) + 20px); left: 24px; right: 24px; gap: 16px; }
+.chip {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 9px;
+  row-gap: 3px;
+  max-width: 370px;
+  padding: 10px 17px 11px 10px;
+  border: 2px solid #fffef8;
+  border-radius: 24px;
+  background: linear-gradient(155deg, #fffef9, #f7f2e7);
+  color: var(--berry);
+  box-shadow: var(--ui-panel-shadow);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.chip-mark { grid-row: 1 / 3; filter: drop-shadow(0 2px 0 rgba(75, 125, 89, .12)); }
+.chip b { font-size: 19px; font-weight: 900; line-height: 1.2; letter-spacing: .025em; }
+.chip small { color: #756a7b; font-size: 10px; line-height: 1.4; opacity: 1; }
+.hud-buttons { gap: 9px; }
+.round {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  border: 2px solid #fffdf5;
+  border-radius: 18px;
+  background: linear-gradient(155deg, #fffef9, #efe6e0);
+  color: var(--berry);
+  box-shadow: 0 4px 0 #cbbdc7, 0 8px 18px rgba(20, 15, 44, .17), inset 0 1px 0 #fff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: transform .15s, box-shadow .15s, background .15s;
+}
+.round .ui-icon { width: 26px; height: 26px; }
+.round:active, .replay:active { transform: translateY(3px); box-shadow: 0 1px 0 #bbaaaf, inset 0 2px 4px rgba(113, 83, 117, .12); }
+#music.is-on { background: linear-gradient(#e3efde, #a7ceb6); color: #3f725c; border-color: #f1fae9; box-shadow: 0 4px 0 #7f9f91, 0 8px 18px rgba(20, 15, 44, .17); }
+.round:not(.is-on)#music { opacity: 1; text-decoration: none; color: #958794; background: linear-gradient(#f5f0ed, #e3d9dd); }
+#music:not(.is-on)::after { content: ""; position: absolute; width: 29px; height: 3px; border-radius: 2px; background: #ac7b83; transform: rotate(-46deg); box-shadow: 0 0 0 2px #f0e8e7; pointer-events: none; }
+.wall-open i { right: -5px; top: -6px; min-width: 20px; height: 20px; padding: 0 4px; border: 1px solid #fff7db; background: #f7cd78; color: #765333; font-size: 10px; line-height: 18px; box-shadow: 0 2px 0 #c69f60; }
+.star-count { gap: 5px; min-width: 76px; height: 48px; padding: 0 13px 0 9px; border: 2px solid #fff9df; border-radius: 18px; background: linear-gradient(#fff8df, #f9e5b3); color: #a47b3c; box-shadow: 0 4px 0 #c7ad83, 0 8px 18px rgba(20, 15, 44, .17); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.star-count b { color: #886644; font: 900 21px/1 "Arial Rounded MT Bold", "Trebuchet MS", sans-serif; font-variant-numeric: tabular-nums; }
+.star-icon { width: 27px; height: 27px; filter: drop-shadow(0 2px 0 rgba(187, 137, 47, .2)); }
+
+/* 字幕是一枚有厚度的小气泡；原有语音播放状态仍保留。 */
+.caption {
+  z-index: 12;
+  bottom: calc(env(safe-area-inset-bottom) + var(--ui-dock-bottom) + var(--ui-slot-size) + 48px);
+  width: min(460px, calc(100% - 28px));
+  min-height: 70px;
+  gap: 10px;
+  padding: 10px 11px 11px 14px;
+  border: 2px solid #fffef8;
+  border-radius: 24px;
+  background: linear-gradient(165deg, #fffefa, #f5eddf);
+  box-shadow: 0 5px 0 #cfc0bc, 0 11px 26px rgba(20, 15, 44, .2);
+  color: var(--ink);
+}
+.caption::before, .caption.is-speaking::before { content: none; display: none; animation: none; }
+.caption::after { content: ""; position: absolute; left: 35px; bottom: -8px; width: 14px; height: 14px; background: #f6eee1; border-radius: 0 0 5px 0; transform: rotate(45deg); box-shadow: 3px 3px 0 #cfc0bc; z-index: -1; }
+.caption-friend { width: 34px; height: 34px; filter: drop-shadow(0 2px 0 rgba(200, 155, 68, .16)); transform-origin: 50% 70%; }
+.caption.is-speaking .caption-friend { animation: ui-friend-speak .55s ease-in-out infinite alternate; }
+.caption p { min-width: 0; font-size: 14px; line-height: 1.5; font-weight: 600; overflow-wrap: anywhere; }
+.caption p b { color: #8e5b4b; font-weight: 800; }
+.replay { display: grid; place-items: center; width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 7px; border: 2px solid #fff7d7; border-radius: 15px; background: linear-gradient(#f9dc91, #f2c669); color: #8a653a; box-shadow: 0 3px 0 #c8a15e, inset 0 1px 0 rgba(255, 255, 255, .6); transition: transform .15s, box-shadow .15s; }
+.replay .ui-icon { width: 25px; height: 25px; }
+@keyframes ui-friend-speak { to { transform: translateY(-2px) rotate(-5deg); } }
+
+/* 六彩积木仍使用游戏注入的晶石颜色；状态由形状和明暗共同区分。 */
+.bag {
+  z-index: 12;
+  bottom: calc(env(safe-area-inset-bottom) + var(--ui-dock-bottom));
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  gap: 8px;
+  padding: 10px 10px 13px;
+  border: 2px solid #fffdf8;
+  border-radius: 26px;
+  background: linear-gradient(#eee7ec, #ded5e3);
+  box-shadow: 0 7px 0 #a898b0, 0 12px 26px rgba(20, 15, 44, .24), inset 0 2px 0 #fff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.slot {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--ui-slot-size);
+  height: var(--ui-slot-size);
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 2px solid #f8f1f3;
+  border-radius: 15px;
+  background: linear-gradient(165deg, #ebe4ed, #d7cbdc);
+  color: #a093ab;
+  font: 900 31px/1 "Arial Rounded MT Bold", "Trebuchet MS", sans-serif;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .65);
+  box-shadow: inset 0 3px 4px rgba(115, 87, 127, .15), 0 1px 0 #fff7f5;
+  transition: transform .18s, background .18s, box-shadow .18s, border-color .18s;
+}
+.slot[hidden] { display: none; }
+.slot span { transform: translateY(1px); pointer-events: none; }
+.slot.is-has, .slot.is-selected {
+  border-color: rgba(255, 253, 247, .8);
+  background: linear-gradient(155deg, rgba(255, 255, 255, .35), rgba(255, 255, 255, .08) 67%), var(--slot-color, var(--honey));
+  color: #fffdf7;
+  text-shadow: 0 2px 0 rgba(79, 53, 87, .3);
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--slot-color, var(--honey)), #675179 26%), 0 7px 7px rgba(92, 67, 95, .15), inset 0 2px 0 rgba(255, 255, 255, .45);
+}
+.slot.is-has::before, .slot.is-selected::before { content: ""; position: absolute; top: 5px; left: 8px; width: 38%; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, .45); pointer-events: none; }
+.slot.is-selected { transform: translateY(-7px); outline: 3px solid #fff3b8; outline-offset: 3px; border-color: #fffef6; box-shadow: 0 6px 0 color-mix(in srgb, var(--slot-color, var(--honey)), #675179 26%), 0 10px 14px rgba(76, 53, 91, .25), inset 0 2px 0 rgba(255, 255, 255, .5); }
+.slot.is-placed { border-color: #ac99b8; border-style: dashed; background: #e7e0e9; color: #74637f; box-shadow: inset 0 2px 4px rgba(115, 87, 127, .12); text-shadow: 0 1px 0 #fff; }
+.slot.is-placed span { font-size: .8em; transform: translateY(-6px); }
+.slot.is-placed::after { bottom: 4px; font-size: 9px; line-height: 1; color: #75617d; }
+.slot:disabled, .slot[aria-disabled="true"] { filter: saturate(.3); opacity: .55; transform: none; outline: none; animation: none; box-shadow: inset 0 2px 4px rgba(115, 87, 127, .16); }
+.slot.is-hint { border-color: #fff9db; animation: ui-slot-nudge 1.4s ease-in-out infinite; }
+.slot.pop { animation: ui-slot-pop .45s ease-out; }
+.slot:not(:disabled):active { transform: translateY(3px); }
+@keyframes ui-slot-nudge { 0%, 100% { transform: translateY(0); } 38% { transform: translateY(-5px); } }
+@keyframes ui-slot-pop { 40% { transform: translateY(-6px) scale(1.12) rotate(-3deg); } 75% { transform: translateY(1px); } }
+.fly { border: 2px solid rgba(255, 253, 247, .8); border-radius: 14px; text-shadow: 0 2px 0 rgba(79, 53, 87, .25); box-shadow: 0 5px 0 rgba(103, 81, 121, .28), 0 8px 20px rgba(20, 15, 44, .2), inset 0 2px 0 rgba(255, 255, 255, .45); }
+.star-plus { border: 2px solid #fff8de; background: #fff4d5; color: #88643a; box-shadow: 0 3px 0 #c7ad83, 0 7px 16px rgba(20, 15, 44, .2); }
+.vignette { background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(74, 50, 101, .10) 100%); }
+
+/* 开场、字母课、字母墙和完成卡共享奶油玩具盒。 */
+.overlay { z-index: 30; padding: max(16px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom)); background: radial-gradient(circle at 50% 30%, rgba(87, 73, 114, .42), rgba(20, 18, 45, .75)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+.card, .wall-card, .lesson-card { border: 2px solid #fffefa; background: linear-gradient(155deg, #fffef9, #f5eee4); color: var(--ink); box-shadow: 0 8px 0 #c4b3bf, 0 22px 50px rgba(20, 15, 44, .3), inset 0 1px 0 #fff; }
+.card { width: min(412px, 100%); max-height: calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow-y: auto; padding: 24px 26px 25px; border-radius: 32px; scrollbar-width: thin; scrollbar-color: #c6b7ce transparent; }
+.card h1 { margin: 7px 0 11px; font-size: 29px; letter-spacing: .025em; color: var(--berry); }
+.card p { color: #756679; font-size: 14px; line-height: 1.7; }
+.card p b { color: #876147; }
+.tag { padding: 4px 11px; border: 1px solid #d8e6cd; background: #e6efdc; color: #4d765e; font-size: 11px; font-weight: 700; }
+.planet-icon { width: 140px; height: 132px; margin: -2px auto 7px; border-radius: 0; background: none; box-shadow: none; }
+.planet-mascot { width: 140px; height: 132px; }
+.howto { gap: 7px; margin-bottom: 20px; color: #877489; }
+.howto li { flex: 1; min-width: 0; padding: 7px 4px 8px; border: 1px solid #e7dfe3; border-radius: 15px; background: linear-gradient(#f3ede8, #ebe2e7); box-shadow: inset 0 1px 0 #fffcf6; font-size: 11px; }
+.howto-icon { margin: 0 auto 3px; }
+.howto b { margin-bottom: 2px; font-size: 12px; color: #6c5c76; }
+.primary, .ghost { min-height: 50px; border: 2px solid #fff5d5; border-radius: 17px; font-size: 16px; transition: transform .15s, box-shadow .15s; }
+.primary { background: linear-gradient(#f8d986, #f0bf61); color: #7a532f; box-shadow: 0 5px 0 #c29c5d, 0 7px 12px rgba(137, 100, 73, .13), inset 0 2px 0 rgba(255, 255, 255, .4); }
+.primary:disabled { opacity: .65; filter: saturate(.65); box-shadow: 0 3px 0 #c8b797; }
+.ghost { border-color: #fffdf7; background: linear-gradient(#f4efe9, #e5dce5); color: #75627f; box-shadow: 0 3px 0 #c8b9cc, inset 0 1px 0 #fff; }
+.primary:not(:disabled):active, .ghost:active { transform: translateY(3px); box-shadow: 0 1px 0 #baa5b8; }
+.row { gap: 12px; }
+.legal { color: #918296; font-size: 10px; line-height: 1.5; }
+.big-emoji { margin: 4px 0 14px; font-size: 58px; }
+#done-title { font-size: clamp(23px, 6vw, 29px); overflow-wrap: anywhere; }
+
+.lesson { z-index: 10; padding-bottom: calc(env(safe-area-inset-bottom) + 196px); background: radial-gradient(circle at 50% 40%, rgba(255, 250, 240, .03), rgba(28, 22, 52, .4)); }
+.lesson-card { padding: 19px 18px 17px; border-radius: 30px; animation: ui-card-rise .35s ease-out; }
+.lesson-steps { gap: 8px; }
+.lesson-steps i { width: 36px; height: 9px; background: #dfd6e0; box-shadow: inset 0 2px 2px rgba(103, 81, 121, .12); }
+.lesson-steps i.is-on { background: linear-gradient(#bbd9b9, #8cb99f); box-shadow: 0 2px 0 #789c87, inset 0 1px 0 #dbeed0; }
+.lesson-labels { color: #8d7c92; font-size: 10px; gap: 8px; margin-top: 6px; }
+.lesson-labels span { width: 36px; }
+.lesson[data-step="1"] .lesson-labels span:nth-child(1), .lesson[data-step="2"] .lesson-labels span:nth-child(2), .lesson[data-step="3"] .lesson-labels span:nth-child(3), .lesson[data-step="4"] .lesson-labels span:nth-child(4) { color: #548067; }
+.lesson-main { width: min(240px, 56vw, 29dvh); margin-top: 8px; }
+.lesson-letter { font-size: min(190px, 46vw, 24dvh); text-shadow: 0 5px 0 rgba(103, 81, 121, .17); }
+.lesson-upper { color: #8c7b94; font-size: 13px; }
+.lesson-trace { background: #fffdf8; border-radius: 20px; box-shadow: inset 0 0 0 3px #e6dbde, inset 0 3px 9px rgba(103, 81, 121, .07); }
+.lesson-keyword { color: #6d5a79; font-size: 21px; }
+.lesson-keyword span { font-size: 35px; }
+.lesson-say { font-size: 30px; }
+.lesson-say i { background: var(--mint); }
+.lesson-replay { right: 13px; bottom: 13px; }
+@keyframes ui-card-rise { from { opacity: 0; transform: translateY(12px) scale(.97); } }
+
+.wall-card { max-height: calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); padding: 20px 18px 18px; border-radius: 30px; scrollbar-width: thin; scrollbar-color: #c6b7ce transparent; }
+.wall-head { gap: 10px; margin-bottom: 16px; }
+.wall-head h2 { color: var(--berry); font-size: 22px; }
+.wall-head h2 span { color: #a97c43; font-size: 14px; }
+.wall-head small { display: block; margin-top: 4px; color: #8b7991; font-size: 11px; }
+.wall-close { background: linear-gradient(#f7f1ec, #e7dde7); }
+.wall-grid { gap: 8px; }
+.wall-cell { min-width: 44px; min-height: 68px; padding: 7px 2px 6px; border: 2px solid #e4d9e7; border-radius: 14px; background: linear-gradient(#f0eaf0, #e8dfe9); color: #aa99b3; box-shadow: inset 0 2px 3px rgba(103, 81, 121, .08); }
+.wall-cell b { font: 900 18px/1.1 "Arial Rounded MT Bold", "Trebuchet MS", sans-serif; }
+.wall-cell span { font-size: 25px; }
+.wall-cell small { min-height: 13px; color: #87748f; font-size: 10px; }
+.wall-cell.is-on { border-color: #e5c681; background: linear-gradient(#fffdf4, #f6e9c7); color: #6b5778; box-shadow: 0 3px 0 #d2bb88, inset 0 1px 0 #fff; }
+.wall-cell.is-vowel b { color: #ad6c68; }
+.wall-cell.is-vowel:not(.is-on) b { color: #b6959d; }
+.wall-cell:active { transform: translateY(2px); }
+.wall-vowels { margin-top: 15px; color: #8b7991; font-size: 12px; }
+.wall-vowels b { margin-left: 9px; }
+
+@media (hover: hover) {
+  .round:hover, .replay:hover, .primary:not(:disabled):hover, .ghost:hover { filter: brightness(1.045); }
+  .slot.is-has:not(:disabled):hover { transform: translateY(-3px); }
+  .wall-cell.is-on:hover { background: #fff8df; }
+}
+@media (max-width: 600px) {
+  :root { --ui-dock-bottom: 16px; }
+  .hud-top { top: calc(env(safe-area-inset-top) + 12px); left: 14px; right: 14px; gap: 10px; align-items: flex-start; }
+  .chip { grid-template-columns: 31px minmax(0, 1fr); column-gap: 6px; padding: 8px 10px 9px 7px; border-radius: 20px; flex: 1; }
+  .chip-mark { width: 31px; height: 31px; }
+  .chip b { font-size: 16px; letter-spacing: 0; }
+  .chip small { font-size: 9px; }
+  .hud-buttons { display: grid; grid-template-columns: repeat(3, 44px); gap: 7px; }
+  .star-count { grid-column: 1 / -1; justify-self: end; min-width: 68px; height: 44px; padding: 0 10px 0 7px; border-radius: 17px; }
+  .star-count b { font-size: 20px; }
+  .star-icon { width: 25px; height: 25px; }
+  .round { width: 44px; height: 44px; border-radius: 16px; padding: 6px; }
+  .round .ui-icon { width: 25px; height: 25px; }
+  .bag { gap: 6px; padding: 10px 10px 13px; border-radius: 23px; }
+  .slot { border-radius: 14px; font-size: 28px; }
+  .caption { width: calc(100% - 28px); min-height: 64px; gap: 8px; padding: 9px 9px 10px 11px; border-radius: 22px; }
+  .caption-friend { width: 29px; height: 29px; }
+  .caption p { font-size: 13px; }
+  .card { padding: 20px 20px 22px; border-radius: 28px; }
+  .card h1 { font-size: 27px; }
+  .wall-card { padding: 17px 14px 15px; }
+  .wall-grid { gap: 7px; }
+}
+@media (max-width: 360px) {
+  :root { --ui-dock-bottom: 14px; }
+  .hud-top { left: 10px; right: 10px; gap: 7px; }
+  .chip { grid-template-columns: 26px minmax(0, 1fr); column-gap: 5px; padding: 9px 8px 10px 6px; }
+  .chip-mark { width: 26px; height: 26px; }
+  .chip b { font-size: 14px; }
+  .chip small { font-size: 8px; }
+  .hud-buttons { gap: 5px; }
+  .bag { gap: 4px; padding: 8px 8px 11px; border-radius: 21px; }
+  .slot { font-size: 26px; border-radius: 12px; }
+  .slot.is-selected { outline-offset: 2px; outline-width: 2px; }
+  .caption { width: calc(100% - 20px); gap: 6px; padding: 8px; }
+  .caption-friend { width: 24px; height: 24px; }
+  .caption p { font-size: 12px; }
+  .overlay { padding-left: 12px; padding-right: 12px; }
+  .card { padding-left: 17px; padding-right: 17px; }
+  .card p { font-size: 13px; }
+  .howto { gap: 5px; }
+  .howto li { font-size: 10px; }
+  .wall-card { padding-left: 12px; padding-right: 12px; }
+  .wall-grid { gap: 5px; }
+  .wall-head h2 { font-size: 20px; }
+  .wall-head small { font-size: 10px; }
+}
+@media (max-height: 700px) {
+  .card { padding-top: 16px; padding-bottom: 18px; }
+  .planet-icon, .planet-mascot { width: 110px; height: 104px; }
+  .planet-icon { margin-bottom: 4px; }
+  .card h1 { margin-top: 5px; margin-bottom: 8px; font-size: 25px; }
+  .card p { margin-bottom: 12px; }
+  .howto { margin-bottom: 15px; }
+  .legal { margin-top: 11px; font-size: 9px; }
+  .lesson-card { padding-top: 16px; padding-bottom: 14px; }
+  .lesson-main { width: min(190px, 52vw, 27dvh); }
+  .lesson-letter { font-size: min(155px, 44vw, 22dvh); }
+}
+@media (max-height: 480px) and (min-width: 601px) {
+  :root { --ui-slot-size: 44px; --ui-dock-bottom: 14px; }
+  .hud-top { top: calc(env(safe-area-inset-top) + 10px); left: 14px; right: 14px; }
+  .chip { padding: 7px 12px 8px 8px; border-radius: 20px; }
+  .chip b { font-size: 16px; }
+  .chip small { font-size: 9px; }
+  .round { width: 44px; height: 44px; }
+  .star-count { height: 44px; }
+  .bag { left: auto; right: 16px; transform: none; gap: 6px; padding: 8px 8px 11px; }
+  .caption { left: auto; right: 16px; transform: none; width: 330px; min-height: 60px; padding: 7px 9px; }
+  .caption p { font-size: 12px; }
+  .caption-friend { width: 26px; height: 26px; }
+  .lesson { padding: 77px 51% 16px 16px; }
+  .lesson-card { max-height: calc(100dvh - 96px); overflow-y: auto; padding: 12px; }
+  .lesson-main { width: 100px; }
+  .lesson-letter { font-size: 88px; }
+  .lesson-keyword { font-size: 17px; }
+  .lesson-keyword span { font-size: 26px; }
+  .lesson-say { font-size: 24px; }
+  .card { max-height: calc(100dvh - 32px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .caption.is-speaking .caption-friend, .slot.is-hint, .slot.pop, .lesson-card { animation: none; }
+  .round, .replay, .slot, .primary, .ghost { transition: none; }
+}
+
+/* v2 引导：奶油手套的指尖朝右下，left/top 仍接收原游戏的目标中心。 */
+#hint-hand {
+  --hint-size: 60px;
+  --hint-anchor-x: -83%;
+  --hint-anchor-y: -87%;
+  --hint-clearance: 12px;
+  z-index: 14;
+  width: var(--hint-size);
+  height: var(--hint-size);
+  margin: 0;
+  padding: 0;
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  background: url("assets/art/tutorial-glove.png") center / contain no-repeat;
+  pointer-events: none;
+  transform: translate(var(--hint-anchor-x), calc(var(--hint-anchor-y) - var(--hint-clearance)));
+  transform-origin: 83% 87%;
+  filter: drop-shadow(0 3px 2px rgba(86, 61, 88, .24));
+  animation: art-hand-tap 1.2s ease-in-out infinite;
+}
+#hint-hand[hidden] { display: none; }
+#hint-hand.is-swipe { --hint-clearance: 42px; animation: none; }
+@keyframes art-hand-tap {
+  0%, 100% { transform: translate(var(--hint-anchor-x), calc(var(--hint-anchor-y) - var(--hint-clearance) - 3px)); }
+  50% { transform: translate(var(--hint-anchor-x), calc(var(--hint-anchor-y) - var(--hint-clearance) + 3px)); }
+}
+#art-hint-path { position: fixed; inset: 0; z-index: 13; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+#art-hint-path * { pointer-events: none; }
+#art-hint-path[hidden] { display: none; }
+.art-hint-dot { fill: #ffe48c; stroke: rgba(255, 251, 206, .7); stroke-width: 1; filter: drop-shadow(0 1px 2px rgba(223, 174, 66, .23)); }
+.art-hint-arrow { fill: none; stroke: #ffe48c; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1px 1px rgba(223, 174, 66, .25)); }
+@media (max-width: 600px) {
+  #hint-hand { --hint-size: 36px; }
+  #hint-hand.is-swipe { --hint-clearance: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { #hint-hand { animation: none; } }

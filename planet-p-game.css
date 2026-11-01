@@ -1,0 +1,8 @@
+#p-bubble-hud{position:fixed;z-index:17;left:50%;bottom:calc(112px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:calc(100% - 36px);width:max-content;padding:10px 17px;border:1px solid #fff8;border-radius:22px;background:#fff7f0e8;box-shadow:0 4px 20px #77567420;color:#735276;font:700 14px/1.5 'PingFang SC',sans-serif;text-align:center;pointer-events:none}
+#p-bubble-hud[hidden]{display:none}
+body[data-planet="p01"] .caption[data-speaker="grandma"] p::before{content:'小猪噗噗';color:#ad6889}
+body[data-planet="p01"] .caption[data-speaker="tangtang"] p::before{content:'糖糖';color:#ad6889}
+body[data-planet="p01"] .caption[data-speaker="tangtang"] .caption-friend{border-radius:50%;background:radial-gradient(circle at 50% 40%,#fff6e8,#f5dcc6);box-shadow:0 0 0 2px #fff,0 2px 0 #e2c3ad}
+body.p-activity #crystal-arrow,body.p-activity #npc-guide,body.p-activity .world-guide,body.p-activity #hint-hand,body.p-activity .hud-top,body.p-activity #bag,body.p-activity #hint-button{pointer-events:none;visibility:hidden!important}
+body.p-reward #p-bubble-hud{display:none}
+@media(max-height:500px){#p-bubble-hud{bottom:16px;padding:6px 14px;font-size:12px}}

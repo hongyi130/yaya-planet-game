@@ -1,0 +1,10 @@
+/* The backpack is the first item inside the dock. Keep all six letter buttons
+   at least 44px wide; narrow screens reduce gaps rather than touch targets. */
+:root {--ui-slot-size:clamp(44px,calc((100vw - 124px) / 6),58px);}
+.bag {align-items:center;}
+.bag-identity {position:static;flex:0 0 32px;width:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#75607c;font:700 10px/1 system-ui,sans-serif;white-space:nowrap;pointer-events:none;}
+.bag-identity img {width:30px;height:33px;object-fit:contain;image-rendering:pixelated;}
+.slot,.fly {font-family:"Arial Rounded MT Bold",Arial,sans-serif;text-transform:none;}
+@media(max-width:600px){.bag{gap:4px;padding-left:8px;padding-right:8px;}.bag-identity{flex-basis:28px;width:28px;}.bag-identity img{width:26px;height:29px;}}
+@media(max-width:360px){.bag{gap:1px;padding-left:4px;padding-right:4px;}.bag-identity{flex-basis:22px;width:22px;font-size:9px;}.bag-identity img{width:22px;height:25px;}}
+@media(max-height:480px) and (min-width:601px){:root{--ui-slot-size:44px;}.bag-identity{flex-basis:26px;width:26px;}.bag-identity img{width:24px;height:27px;}}

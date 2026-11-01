@@ -1,0 +1,122 @@
+[
+  {
+    "key": "arrive-l02",
+    "group": "voice",
+    "expected": "欢迎来到寻宝星球！",
+    "transcript": "欢迎来到寻宝星球",
+    "normalized_match": true,
+    "homophone_match": false,
+    "status": "match",
+    "sha256": "3d18fa8c8b695d9d0123d88d9e678365c5885aebd96443caca7d27a2daacfb48",
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  },
+  {
+    "key": "l02-intro",
+    "group": "voice",
+    "expected": "六个新字母藏在这里。跟着金色光点，找到它们，一起去寻宝吧！",
+    "transcript": "六个新字母藏在这里跟着金色光点找到他们一起去寻宝吧",
+    "normalized_match": false,
+    "homophone_match": true,
+    "status": "homophone",
+    "sha256": "bf823dfe12274183a4ace8e66563089e874340aeb02916abd78771d27040552a",
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  },
+  {
+    "key": "done-l01-next",
+    "group": "voice",
+    "expected": "太棒啦！字母星球完成啦！寻宝星球亮起来了，点它就能飞过去。",
+    "transcript": "太棒了,字母星球完成了,寻宝星球亮起来了,点它就能飞过去。",
+    "normalized_match": false,
+    "homophone_match": false,
+    "status": "review",
+    "sha256": "d4845da2cd66f3ba97ab3dd1e2de77182207a2422684562967bc4a8908251fd3",
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  },
+  {
+    "key": "done-l02",
+    "group": "voice",
+    "expected": "太棒啦！寻宝星球完成啦！猫星球亮起来了，点它就能飞过去。",
+    "transcript": "太棒了,寻宝星球完成了,猫星球亮起来了,点它就能飞过去。",
+    "normalized_match": false,
+    "homophone_match": false,
+    "status": "review",
+    "sha256": "804cc39e7a7b40452be018f55b0ab356ab0a22734e021c91aa4a41e5a77e7842",
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  },
+  {
+    "key": "reward-dog",
+    "group": "voice",
+    "expected": "一只小狗跑出来啦！它会陪你一起探险。",
+    "transcript": "一只小狗跑出来了它会陪你一起探险",
+    "normalized_match": false,
+    "homophone_match": false,
+    "status": "review",
+    "sha256": "fc23b5850c3c56010a22c55b138a8946361aacc7164ea5f62725a0d71d8ef6db",
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  },
+  {
+    "key": "reward-cap",
+    "group": "voice",
+    "expected": "一顶棒球帽！戴上它，继续探险吧。",
+    "transcript": "一顶棒球帽戴上它继续探险吧",
+    "normalized_match": true,
+    "homophone_match": false,
+    "status": "match",
+    "sha256": "485221b38944850fa57816f3cf1d659920023f114c79d14f08a42b63cca62021",
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  },
+  {
+    "key": "reward-map",
+    "group": "voice",
+    "expected": "一张藏宝地图！展开它，看看上面的路线吧。",
+    "transcript": "一张藏宝地图展开它看看上面的路线吧",
+    "normalized_match": true,
+    "homophone_match": false,
+    "status": "match",
+    "sha256": "b879a96a7ac4188fe54e50d4444cff6f145209a71fb831479658d949c6336e1f",
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  },
+  {
+    "key": "l02-review",
+    "group": "voice",
+    "expected": "上一颗星球学过的两个字母，也会来帮你拼词哦！",
+    "transcript": "上一颗星球学过的两个字母也会来帮你拼词哦",
+    "normalized_match": true,
+    "homophone_match": false,
+    "status": "match",
+    "sha256": "f61dcf2cee019764729170413029c8cb99d659e23ffb0ded5185358145d743ae",
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  },
+  {
+    "key": "cap",
+    "group": "audio",
+    "expected": "cap",
+    "transcript": "Cap",
+    "normalized_match": true,
+    "homophone_match": false,
+    "status": "match",
+    "sha256": "7317a2a698d64b8a4a36e5896d6c5f8e00e801be6e2c54a90db23770a5398b9e",
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  },
+  {
+    "key": "map",
+    "group": "audio",
+    "expected": "map",
+    "transcript": "Map.",
+    "normalized_match": true,
+    "homophone_match": false,
+    "status": "match",
+    "sha256": "354608cc19e7e9f78dc810aebe816f771b2ee793c0640d0c6b81890ff14fae0a",
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "method": "individual final AAC; no text prompt; 500ms padding each side for recognition only"
+  }
+]
