@@ -1344,29 +1344,43 @@
     g.setTargetAtTime(0.12, now, 0.05);
     g.setTargetAtTime(sound.musicOn ? 0.5 : 0, now + seconds, 0.4);
   }
-  const wordAudio = {};
   let currentWordAudio = null;
+  // Public builds fetch audio on demand. Wait for playback, not a timer started
+  // before the download; always stop abandoned audio before releasing the queue.
+  function playMediaAudio(a) {
+    return new Promise((resolve) => {
+      let settled = false, timer;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        for (const event of ["ended", "error", "pause"]) a.removeEventListener(event, finish);
+        for (const event of ["playing", "timeupdate"]) a.removeEventListener(event, progress);
+        a.pause();
+        resolve();
+      };
+      const progress = () => {
+        clearTimeout(timer);
+        timer = setTimeout(finish, 20000);
+      };
+      for (const event of ["ended", "error", "pause"]) a.addEventListener(event, finish);
+      for (const event of ["playing", "timeupdate"]) a.addEventListener(event, progress);
+      timer = setTimeout(finish, 30000);
+      a.play().catch(finish);
+    });
+  }
   // 单独的 /r/ 字母音录得不好，先整体屏蔽（以后有合格的录音再去掉这里）
   const BLOCKED_SOUNDS = new Set(["ls-r"]);
   function rawPlayWord(word) {
     if (BLOCKED_SOUNDS.has(word)) return Promise.resolve();
     const src = ASSETS[`audio/${word}.mp3`] || ASSETS[`audio/${word}.m4a`];
     if (!src) return Promise.resolve();
-    wordAudio[word] = wordAudio[word] || new Audio(src);
-    const a = wordAudio[word];
-    if (currentWordAudio && currentWordAudio !== a) currentWordAudio.pause();
+    const a = new Audio(src);
+    if (currentWordAudio) currentWordAudio.pause();
     currentWordAudio = a;
     a.currentTime = 0;
     duckMusic();
-    return new Promise((resolve) => {
-      const done = () => {
-        a.removeEventListener("ended", done);
-        resolve();
-      };
-      a.addEventListener("ended", done);
-      a.play().catch(done);
-      setTimeout(done, 3000);
-    });
+    return playMediaAudio(a);
   }
 
   // ---------- 界面 ----------
@@ -1382,14 +1396,14 @@
         resolve();
         return;
       }
-      voice.token += 1;
+      stopVoice();
       const token = voice.token;
       voice.key = key;
       voice.at = performance.now();
-      if (voice.audio) voice.audio.pause();
-      if (window.speechSynthesis) window.speechSynthesis.cancel();
       captionEl.classList.add("is-speaking");
+      let fallbackTimer;
       const finish = () => {
+        clearTimeout(fallbackTimer);
         if (voice.pending === finish) voice.pending = null;
         if (token === voice.token) captionEl.classList.remove("is-speaking");
         resolve();
@@ -1399,9 +1413,7 @@
       if (src) {
         const a = new Audio(src);
         voice.audio = a;
-        a.onended = finish;
-        a.onerror = finish;
-        a.play().catch(finish);
+        playMediaAudio(a).then(finish);
         duckMusic(6);
       } else if (window.speechSynthesis && VOICE_LINES[key]) {
         const u = new SpeechSynthesisUtterance(VOICE_LINES[key]);
@@ -1409,14 +1421,16 @@
         u.rate = 0.95;
         u.onend = finish;
         u.onerror = finish;
+        fallbackTimer = setTimeout(() => {
+          if (token === voice.token) window.speechSynthesis.cancel();
+          finish();
+        }, 12000);
         window.speechSynthesis.speak(u);
       } else if (/^p01-/.test(key)) {
-        setTimeout(finish, 3800);   // 资源加载失败时保留字幕阅读时间，不阻塞任务
+        fallbackTimer = setTimeout(finish, 3800);   // 资源加载失败时保留字幕阅读时间，不阻塞任务
       } else {
         finish();
       }
-      // 万一音频事件没回来，也别卡住后面的流程
-      setTimeout(finish, 12000);
     });
   }
   function stopVoice() {
@@ -1459,12 +1473,10 @@
   // original narrated comparisons and add a short, separately replayable name.
   const hasLetterName = l => 'astip'.includes(l) && !!ASSETS[`audio/name-${l}.m4a`];
   async function sayCaseWithName(html, key, letter, { interrupt = false, phoneme = false } = {}) {
-    if (interrupt) interruptSpeech();
-    const gen = speech.gen;
-    await say(html, { voice: key });
-    if (gen !== speech.gen) return;
-    if (hasLetterName(letter)) await playWord(`name-${letter}`);
-    if (phoneme && gen === speech.gen) await playWord(`ls-${letter}`);
+    const then = [];
+    if (hasLetterName(letter)) then.push(`name-${letter}`);
+    if (phoneme) then.push(`ls-${letter}`);
+    await say(html, { voice: key, then, interrupt });
   }
 
   // 字幕 + 语音：voice 是语音条目，then 是语音说完以后再播的英文单词
@@ -1489,21 +1501,27 @@
       captionEl.style.animation = "";
       say.last = { html, key, then, replay, speaker };
       await playVoice(key);
-      if (then && gen === speech.gen) await rawPlayWord(then);
+      for (const word of (Array.isArray(then) ? then : then ? [then] : [])) {
+        if (gen !== speech.gen) break;
+        await rawPlayWord(word);
+      }
     });
   }
   // 点字幕可以再听一遍
   captionEl.addEventListener("click", (event) => {
-    if (event.target === replayButton) return;
+    if (replayButton.contains(event.target)) return;
     lastInput = performance.now();
     if (say.last) say(say.last.html, { voice: say.last.key, then: say.last.then, replay: say.last.replay, interrupt: true, speaker: say.last.speaker });
   });
-  replayButton.addEventListener("click", () => {
+  replayButton.addEventListener("click", (event) => {
+    event.stopPropagation();
     lastInput = performance.now();
     if ((swipe.active || state.digging || state.digPending) && say.last) {
-      say(say.last.html, { voice: say.last.key, replay: true, interrupt: true });
+      say(say.last.html, { voice: say.last.key, then: say.last.then, replay: true, interrupt: true, speaker: say.last.speaker });
     } else if (IS_LETTERS && blend.waiting) hear(`ls-${blend.word[blend.pos]}`);
-    else hear(state.challenge ? CHALLENGES[state.challenge].audio : FIRST_WORD);
+    else if (state.challenge) hear(CHALLENGES[state.challenge].audio);
+    else if (say.last) say(say.last.html, { voice: say.last.key, then: say.last.then, replay: true, interrupt: true, speaker: say.last.speaker });
+    else if (FIRST_WORD) hear(FIRST_WORD);
   });
 
   const state = {
@@ -3345,7 +3363,7 @@
     const blocks=STAGE.slotDirs.slice(0,word.length).map(d=>[...placed.values()].find(b=>arc(b.userData.dir,d)<.45));
     await swipeBlend(blocks,word);const card=PA.WORD_CARDS.find(c=>c.word===word);
     blocks.forEach(b=>burst(b.position.clone(),LETTERS[b.userData.letter].color,10,.8));
-    await say(`就是<b>${card.zh}</b>。`,{voice:(IS_I||IS_P)?null:'meaning-'+word,then:IS_I?word:null});
+    await say(`就是<b>${card.zh}</b>。`,{voice:'meaning-'+word});
     if(IS_P && word==='tap'){round3.machine.tapFlow(3.5);round3.machine.tapTap();await say(YAYA_VOICE_LINES['p01-tap'],{voice:'p01-tap',speaker:'grandma'});}
     if(!made.has(card.id)){made.add(card.id);addStars(5);save()}
     state.spelling=false;blend.word=null;blend.waiting=false;updateWordCount();
@@ -3596,17 +3614,20 @@
     await say("我们一起读：", { voice: "a01-word-read" });
     const tiles = [...$("#word-row").children];
     // 能一个字母一个字母拼读的词（cat、ten、top）才逐个播字母音；turtle、tiger、soup 这种不规则的词直接整词读
-    if (card.sayLetters !== false) for (const [i, ch] of card.word.split("").entries()) {
-      tiles[i].classList.add("is-on");
-      await playWord(`ls-${ch}`);
+    let tileOffset = 0;
+    if (card.sayLetters !== false) for (const group of (card.soundGroups || card.word.split(""))) {
+      const activeTiles = tiles.slice(tileOffset, tileOffset + group.length);
+      tileOffset += group.length;
+      activeTiles.forEach(t => t.classList.add("is-on"));
+      await playWord(`ls-${group === 'ck' ? 'k' : group}`);
       await wait(0.12);
-      tiles[i].classList.remove("is-on");
+      activeTiles.forEach(t => t.classList.remove("is-on"));
     }
     tiles.forEach((t) => t.classList.add("is-on"));
     pic.classList.add("is-bounce");
     await playWord(card.word);
     await wait(0.3);
-    await say(`就是<b>${card.zh}</b>。`, {voice:(IS_I||IS_P)?null:`meaning-${card.word}`,then:IS_I?card.word:null});
+    await say(`就是<b>${card.zh}</b>。`, {voice:`meaning-${card.word}`});
     await wait(0.5);
     closePracticeCard();
   }
@@ -3655,7 +3676,7 @@
         ["#ff9aa8","#ffc78a","#fff09a","#a8e6a1","#9fd3ff","#c9a6ff"].forEach((c,i)=>setTimeout(()=>{burst(at,c,14,1.1);sfx.star&&sfx.star()},i*180));
         practice.cheer=1.6;await say(PA.rewardText,{voice:PA.rewardVoice,speaker:"grandma"});
       }
-      await say(PA.finishText,{voice:PLANET.id+"-done",speaker:"grandma"});showDoneCard();return;}
+      await say(PA.finishText,{voice:PLANET.id+"-done",speaker:"grandma"});showDoneCard({narrate:false});return;}
     practice.stage = 6;
     state.done = true;
     save();
@@ -4488,7 +4509,7 @@
   });
   $("#travel").addEventListener("click", () => travelTo($("#travel").dataset.target));
 
-  function showDoneCard() {
+  function showDoneCard({ narrate = true } = {}) {
     const d = PLANET.done;
     $("#done-emoji").textContent = d.emoji;
     $("#done-title").textContent = d.title;
@@ -4500,7 +4521,7 @@
     button.dataset.target = target || "";
     if (target) button.textContent = `飞往${PLANETS[target].name} 🚀`;
     $("#done").hidden = false;
-    say(`<b>${d.title}</b>`, { voice: d.voice });
+    if (narrate) say(`<b>${d.title}</b>`, { voice: d.voice });
   }
 
   // ---------- 星际旅行：存好进度，镜头拉远飞走，刷新后在新星球降落 ----------
