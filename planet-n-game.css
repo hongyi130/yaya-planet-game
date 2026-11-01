@@ -1,0 +1,17 @@
+body[data-planet="n01"] .caption[data-speaker="grandma"] p::before{content:'夜莺妈妈';color:#8a6f9e}
+#n-roll{position:fixed;inset:0;z-index:60;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(120,100,170,.94),rgba(36,30,72,.98));touch-action:none;color:#fff6e0;font-family:system-ui,sans-serif}
+#n-roll canvas{display:block;touch-action:none}
+.n-roll-header{position:absolute;inset:0 0 auto;padding:max(10px,env(safe-area-inset-top)) 16px 0;text-align:center;pointer-events:none}
+.n-roll-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;max-width:680px;margin:auto;font-size:14px;font-weight:700}
+#n-roll button{pointer-events:auto;min-height:44px;border:2px solid #eed9ac;border-radius:18px;padding:8px 12px;background:#fff5dc;color:#66517f;font:700 14px/1.2 system-ui;cursor:pointer}
+#n-roll button:focus-visible{outline:3px solid white;outline-offset:4px}
+#n-roll button:disabled{opacity:.6;cursor:default}
+#n-roll-tip{margin:12px 0 6px;font-size:24px;line-height:1.2}
+#n-roll-hint{margin:0 auto;max-width:610px;font-size:16px;line-height:1.5;min-height:3em;text-wrap:balance}
+.n-roll-footer{position:absolute;bottom:max(12px,env(safe-area-inset-bottom));left:12px;right:12px;margin:0;text-align:center;font-size:15px;line-height:1.5;pointer-events:none}
+@media(max-height:500px){.n-roll-header{padding-top:6px}.n-roll-actions{position:absolute;inset:6px 16px auto;max-width:none}.n-roll-actions span{visibility:hidden}#n-roll-tip{margin:8px 125px 5px;font-size:22px}#n-roll-hint{margin:8px auto 0;max-width:80%;font-size:14px;min-height:0}.n-roll-footer{bottom:6px;font-size:13px}}
+
+#n-roll-tip small{font-size:14px;opacity:.85;white-space:nowrap}
+
+body.n-ending .hud-top,body.n-ending #bag,body.n-ending #preview-badge,body.n-ending #npc-guide{visibility:hidden;pointer-events:none}
+body.n-ending #caption{top:auto;bottom:max(16px,env(safe-area-inset-bottom));left:50%;right:auto;transform:translateX(-50%);width:min(620px,calc(100% - 32px))}

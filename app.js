@@ -171,7 +171,9 @@
   if(window.YAYA_PLANET_I) PLANETS.i01={...YAYA_PLANET_I.planet,keywords:KEYWORDS};
   // P 泡泡星球：完整课程；preview / r2test 仍使用隔离存档。
   if(window.YAYA_PLANET_P) PLANETS.p01={...YAYA_PLANET_P.planet,keywords:KEYWORDS};
-  const PREVIEW_ONLY = [];
+  // N 月亮鸟巢星球：completed preview course (?preview=n01); formal route remains A/S/T/I/P
+  if(window.YAYA_PLANET_N) PLANETS.n01={...YAYA_PLANET_N.planet,keywords:KEYWORDS};
+  const PREVIEW_ONLY = ["n01"];
   const requestedPreview = new URLSearchParams(location.search).get("preview");
   // Preview uses isolated progress; the normal route includes all five completed planets.
   const PREVIEW_PLANET = (PLANET_ROUTE.includes(requestedPreview) || (PREVIEW_ONLY.includes(requestedPreview) && PLANETS[requestedPreview])) && !PLANETS[requestedPreview].soon ? requestedPreview : null;
@@ -210,16 +212,17 @@
   }
   const playable = (id) => Boolean(PLANETS[id] && !PLANETS[id].soon && (PLANET_ROUTE.includes(id) || (PREVIEW_PLANET && id === PREVIEW_PLANET)));
   const PLANET = playable(progress.current) ? PLANETS[progress.current] : PLANETS.a01;
-  const LARGE_WORLD = PLANET.id === "a01" || (PLANET.id === "s01" && !!window.YayaPlanetSWorld) || (PLANET.id === "t01" && !!window.YayaPlanetTWorld) || (PLANET.id === "i01" && !!window.YayaPlanetIWorld) || (PLANET.id === "p01" && !!window.YayaPlanetPWorld);
+  const LARGE_WORLD = PLANET.id === "a01" || (PLANET.id === "s01" && !!window.YayaPlanetSWorld) || (PLANET.id === "t01" && !!window.YayaPlanetTWorld) || (PLANET.id === "i01" && !!window.YayaPlanetIWorld) || (PLANET.id === "p01" && !!window.YayaPlanetPWorld) || (PLANET.id === "n01" && !!window.YayaPlanetNWorld);
   const R = LARGE_WORLD ? 16 : 9;
   const SURF = R + 0.7;
   const WALK_SPEED = LARGE_WORLD ? 4.2 : 3.2;
   let routeSpeed = 1;   // T race: multiplier for the route speed (Toto runs slower)
   document.body.dataset.planet=PLANET.id;
   document.title=`芽芽小星球｜${PLANET.code} ${PLANET.name}`;
-  const COURSE=PLANET.id==="s01"?window.YAYA_PLANET_S:PLANET.id==="t01"?window.YAYA_PLANET_T:PLANET.id==="i01"?window.YAYA_PLANET_I:PLANET.id==="p01"?window.YAYA_PLANET_P:window.YAYA_PLANET_A;
+  const COURSE=PLANET.id==="s01"?window.YAYA_PLANET_S:PLANET.id==="t01"?window.YAYA_PLANET_T:PLANET.id==="i01"?window.YAYA_PLANET_I:PLANET.id==="p01"?window.YAYA_PLANET_P:PLANET.id==="n01"?window.YAYA_PLANET_N:window.YAYA_PLANET_A;
   const IS_I = PLANET.id === "i01";
   const IS_P = PLANET.id === "p01";
+  const IS_N = PLANET.id === "n01";
   // The final-planet branch keeps its shared key, with the current planet's family and place.
   if (IS_P) {
     window.YAYA_VOICE_LINES['welcome-last'] = window.YAYA_VOICE_LINES['p01-welcome-last'];
@@ -1017,7 +1020,7 @@
 
   if(!LARGE_WORLD&&(!PLANET.theme||PLANET.theme==="forest")) YayaArtWorld.meadowDetails(THREE, scene, cells, obstacles, arc);
   const habitat = PLANET.practice ? YayaWorld.create({registerProp,props,THREE,scene,skyGroup,clouds,planet,cells,PLANET,STAGE,obstacles,place:placeOnSurface,moveAlong,tangent,arc,surfaceRadius,orient,rng,LOW_POWER}) : null;
-  const round3 = LARGE_WORLD ? (PLANET.id === "s01" ? YayaPlanetSWorld : PLANET.id === "t01" && window.YayaPlanetTWorld ? YayaPlanetTWorld : PLANET.id === "i01" && window.YayaPlanetIWorld ? YayaPlanetIWorld : PLANET.id === "p01" && window.YayaPlanetPWorld ? YayaPlanetPWorld : YayaRound3).create({registerProp,props,THREE,scene,skyGroup,clouds,planet,cells,PLANET,STAGE,obstacles,place:placeOnSurface,moveAlong,tangent,arc,surfaceRadius,orient,rng,LOW_POWER,R,START_DIR,crystals,habitat,orchard,camera,setSurfaceOverride:fn=>{planetSurfaceOverride=fn;surfaceCache.clear();}}) : null;
+  const round3 = LARGE_WORLD ? (PLANET.id === "s01" ? YayaPlanetSWorld : PLANET.id === "t01" && window.YayaPlanetTWorld ? YayaPlanetTWorld : PLANET.id === "i01" && window.YayaPlanetIWorld ? YayaPlanetIWorld : PLANET.id === "p01" && window.YayaPlanetPWorld ? YayaPlanetPWorld : PLANET.id === "n01" && window.YayaPlanetNWorld ? YayaPlanetNWorld : YayaRound3).create({registerProp,props,THREE,scene,skyGroup,clouds,planet,cells,PLANET,STAGE,obstacles,place:placeOnSurface,moveAlong,tangent,arc,surfaceRadius,orient,rng,LOW_POWER,R,START_DIR,crystals,habitat,orchard,camera,setSurfaceOverride:fn=>{planetSurfaceOverride=fn;surfaceCache.clear();}}) : null;
   // T：终点拱门挡在镜头和角色之间时，像树一样变透明（不加障碍，跑道照常通过）
   if (PLANET.id === "t01" && round3?.landmarks?.finish?.object) { registerProp(round3.landmarks.finish.object, round3.landmarks.finish.dir, 0); round3.landmarks.finish.object.userData.fadeNearCam = 11; }
   const navigation = LARGE_WORLD ? YayaNavigation.create({THREE,obstacles,arc,moveAlong,tangent,SURF,playerRadius:.24}) : null;
@@ -1426,7 +1429,7 @@
           finish();
         }, 12000);
         window.speechSynthesis.speak(u);
-      } else if (/^p01-/.test(key)) {
+      } else if (/^(p01|n01)-/.test(key)) {
         fallbackTimer = setTimeout(finish, 3800);   // 资源加载失败时保留字幕阅读时间，不阻塞任务
       } else {
         finish();
@@ -1471,7 +1474,7 @@
 
   // A letter's English name is distinct from its phonics sound. Keep the
   // original narrated comparisons and add a short, separately replayable name.
-  const hasLetterName = l => 'astip'.includes(l) && !!ASSETS[`audio/name-${l}.m4a`];
+  const hasLetterName = l => 'astipn'.includes(l) && !!ASSETS[`audio/name-${l}.m4a`];
   async function sayCaseWithName(html, key, letter, { interrupt = false, phoneme = false } = {}) {
     const then = [];
     if (hasLetterName(letter)) then.push(`name-${letter}`);
@@ -1570,7 +1573,7 @@
       const slot = event.target.closest(".slot");
       if (!slot) return;
       lastInput = performance.now();
-      if (!state.started || state.done || state.spelling || pGame?.locked) return;
+      if (!state.started || state.done || state.spelling || pGame?.locked || nGame?.locked) return;
       initAudio();
       const letter = slot.dataset.letter;
       const s = state.bag[letter];
@@ -1725,7 +1728,7 @@
   const particles = [];
   const particleGeo = new THREE.BoxGeometry(0.16, 0.16, 0.16);
   function burst(pos, color, count = 22, power = 1) {
-    if((IS_I || IS_P) && round3?.burst){round3.burst(pos,color,count,power);return;}
+    if((IS_I || IS_P || IS_N) && round3?.burst){round3.burst(pos,color,count,power);return;}
     const mat = new THREE.MeshBasicMaterial({ color });
     const up = pos.clone().normalize();
     for (let i = 0; i < count; i += 1) {
@@ -1787,7 +1790,7 @@
     has:id=>made.has(id),mark:id=>made.add(id),save:()=>save(),stars:n=>addStars(n),trace:i=>courseTrace(i),playWord:w=>playWord(w),say:(h,o)=>say(h,o),sing:()=>{if(performance.now()-voice.at>3500&&!practice.busy)playWord('ls-i')}
   }):null;
   function updatePlayer(dt) {
-    if(iGame?.riding || pGame?.riding){playerMoving=false;return;}
+    if(iGame?.riding || pGame?.riding || nGame?.locked){playerMoving=false;return;}
     let moving = false;
     if (route) {
       const destination = route.waypoints ? route.waypoints[route.index] : route.dir;
@@ -1894,6 +1897,7 @@
     let ahead = (PLANET.camera && PLANET.camera.ahead) || 0;
     // Round 4: look further ahead (raises the horizon) so the sunset sky, small planets and lighthouse fit like the concept.
     if (LARGE_WORLD) { ahead += camera.aspect > 1.2 ? 4.8 : 2.2; if (camera.aspect > 1.2) lift *= .8; }
+    { const pc = PLANET.camera && PLANET.camera.portrait; if (pc && camera.aspect < .8) { if (pc.lift) lift = pc.lift; if (pc.ahead !== undefined) ahead = pc.ahead; } }
     let zoom = 1;
     if (state.challenge && !LARGE_WORLD) {
       focus.lerp(crystals[state.challenge].group.position, 0.45);
@@ -1998,7 +2002,7 @@
       buddy.mouth.scale.set(1 + Math.sin(k * Math.PI) * 0.4 * strength, 1 + Math.sin(k * Math.PI) * 3 * strength, 1);
       buddy.group.position.y = Math.sin(k * Math.PI) * 0.3 * strength;
     });
-    for (let i = 0; i < 3; i += 1) {
+    for (let i = 0; i < (IS_N && LOW_POWER ? 1 : 3); i += 1) {
       const note = new THREE.Sprite(new THREE.SpriteMaterial({ map: noteTexture, transparent: true, depthWrite: false }));
       note.scale.setScalar(0.32);
       u.label.parent.add(note);
@@ -2104,6 +2108,12 @@
       const dir = LARGE_WORLD ? round3.answerDirs[i].clone() : moveAlong(base, right, (i - 1) * 1.7).normalize();
       const block = new THREE.Group();
       const buddy = LARGE_WORLD ? YayaRound3Crystals.create(THREE,"",["#b69be8","#c391d4","#9faee9"][i]) : makeBuddy(BUDDY_COLORS[i % BUDDY_COLORS.length]);
+      if (IS_N && LOW_POWER) {
+        // Blank answer gems need no letter sprites or extra rim/edge layers.
+        // Keep the faceted shell, luminous core and halo at three draws per gem.
+        buddy.body.children.forEach(part => { if (part !== buddy.gem && part !== buddy.item.core) part.visible = false; });
+        buddy.item.sparks.removeFromParent();
+      }
       const label = LARGE_WORLD ? buddy.label : new THREE.Sprite(new THREE.SpriteMaterial({ map: answerLabelTexture(choice.label, choice.note || "点我听听"), depthWrite: false, depthTest: false }));
       // Large world: the letter lives inside the crystal (child of the gem body), so leave it there.
       if (!LARGE_WORLD) {
@@ -2516,6 +2526,16 @@
       const learned = ORDER.filter((l) => crystals[l].collected).length;
       const total = Object.keys(WORDS).length;
       const stage = PLANET.practice ? practice.stage : 0;
+      if (IS_N && stage === 3) {
+        $("#chip-sub").textContent = `N · 滚月亮蛋 ${["roll-N", "roll-n", "roll-N2"].filter(id => made.has(id)).length}/3`;
+        return;
+      }
+      if (IS_N && stage === 5) {
+        const cards = PA.TRACE_WORDS.filter(card => made.has(card.id)).length;
+        $("#chip-sub").textContent = wordsDone() < PA.WORD_CARDS.length
+          ? `N · 拼词 ${wordsDone()}/${PA.WORD_CARDS.length}` : `N · 鸟巢单词卡 ${cards}/${PA.TRACE_WORDS.length}`;
+        return;
+      }
       $("#chip-sub").textContent = PLANET.practice
         ? `${PLANET.code} · ${stage <= 1 ? `任务一 · 认识 ${LETTER.toUpperCase()} ${LETTER}` : stage === 2 || stage === 4 ? `回去找${PA.npcName||"奶奶"} · 领新任务` : stage === 3 ? `任务二 · ${PA.gameTitle||"字母苹果"} ${COURSE_GAME?[...made].filter(k=>k.startsWith("feed")||k.startsWith("gate")||k.startsWith("brick")||k.startsWith("step")).length:applesDone()}/5` : stage === 5 ? `任务三 · ${PA.TASKS?.[2].type==="blend"?((IS_I||IS_P)?"拼词和单词卡":"第一次拼词"):"单词卡"} ${wordsDone()}/${PA.WORD_CARDS.length}` : "三个任务都完成啦"}`
         : learned < ORDER.length
@@ -3158,7 +3178,7 @@
     sc.add(copy);
     const cam = new THREE.PerspectiveCamera(24, 1, 0.1, 20);
     cam.position.set(0.28, 1.0, 2.3);
-    if (PLANET.id === "i01") { cam.position.set(.2,1.3,3.0);cam.lookAt(0,1.2,0); } else if (IS_P) { const ratio=source.scale.x/orchard.granny.root.scale.x;cam.position.set(.25,1.45,3.6).multiplyScalar(ratio);cam.lookAt(0,1.3*ratio,0); } else cam.lookAt(0, 0.86, 0);
+    if (PLANET.id === "i01") { cam.position.set(.2,1.3,3.0);cam.lookAt(0,1.2,0); } else if (IS_P) { const ratio=source.scale.x/orchard.granny.root.scale.x;cam.position.set(.25,1.45,3.6).multiplyScalar(ratio);cam.lookAt(0,1.3*ratio,0); } else if (IS_N) { cam.position.set(.16,1.4,3.25);cam.lookAt(0,1.3,0); } else cam.lookAt(0, 0.86, 0);
     const prevColor = renderer.getClearColor(new THREE.Color());
     const prevAlpha = renderer.getClearAlpha();
     renderer.setRenderTarget(rt);
@@ -3381,8 +3401,9 @@
       else if(PA.TASKS[1].type==='snake')complete=await YayaGames.snake({THREE,cards:PA.WORD_CARDS,done:c=>made.has('feed'+PA.WORD_CARDS.findIndex(w=>w.word===c.word)),sound:hear,wrong:()=>say('这个不是这个声音开头的哦，再试试吧。',{voice:'s01-wrong'}),onEat:async(c,i)=>{sfx.magic();await playWord('ls-s');await playWord(c.word);await say(`就是<b>${c.zh}</b>。`,{voice:'meaning-'+c.word});await courseTrace(i);made.add('feed'+i);addStars(2);save();updateWordCount();}});
       else if(IS_I)complete=await iGame.play();
       else if(IS_P)complete=await pGame.play();
+      else if(IS_N&&nGame)complete=await nGame.play();
       else complete=await runIslandRace();
-      if(complete){practice.stage=4;save();updateWordCount();say(PLANET.id==='s01'?'快回去找你的<b>小蛇朋友</b>，领下一个任务吧！':`回去找<b>${PA.npcName}</b>，领新任务吧。`,{voice:IS_P?'p01-go-npc':IS_I?'i01-go-npc':PLANET.id==='s01'?'s01-go-npc':'r2-go-npc'});}
+      if(complete){practice.stage=4;save();updateWordCount();say(PLANET.id==='s01'?'快回去找你的<b>小蛇朋友</b>，领下一个任务吧！':`回去找<b>${PA.npcName}</b>，领新任务吧。`,{voice:IS_P?'p01-go-npc':IS_N?'n01-go-npc':IS_I?'i01-go-npc':PLANET.id==='s01'?'s01-go-npc':'r2-go-npc'});}
     }finally{practice.busy=false;lastInput=performance.now()}
   }
 
@@ -3418,7 +3439,7 @@
     practice.stage = 2;
     save();
     updateWordCount();
-    say(COURSE_GAME?(PLANET.id==='s01'?'快回去找你的<b>小蛇朋友</b>，领下一个任务吧！':`回去找<b>${PA.npcName}</b>，领新任务吧。`):GO_GRANDMA, { voice: COURSE_GAME?(IS_P?"p01-go-npc":IS_I?"i01-go-npc":PLANET.id==="s01"?"s01-go-npc":"r2-go-npc"):"a01-go-grandma", replay: true });
+    say(COURSE_GAME?(PLANET.id==='s01'?'快回去找你的<b>小蛇朋友</b>，领下一个任务吧！':`回去找<b>${PA.npcName}</b>，领新任务吧。`):GO_GRANDMA, { voice: COURSE_GAME?(IS_P?"p01-go-npc":IS_N?"n01-go-npc":IS_I?"i01-go-npc":PLANET.id==="s01"?"s01-go-npc":"r2-go-npc"):"a01-go-grandma", replay: true });
   }
   // 读档以后摆好任务进度：苹果挂在哪、篮子里有几个、水晶亮不亮
   function initPractice(data) {
@@ -3436,6 +3457,7 @@
     if (state.done) stage = 6;
     if (PLANET.id === "i01" && (state.done || stage >= 6 || made.has("i-finale"))) round3?.setNight?.(true);   // I：读档时 state.done 在 startPractice 之后才设，按进度判断
     practice.stage = stage;
+    if (IS_N && (state.done || stage >= 6 || made.has("n-finale"))) round3.eggsRise(1);
     if(IS_P){
       if(stage>=4 || readStore('yaya-p-activity')?.rescued)round3.returnHome?.();
       if(state.done || stage>=6 || made.has('p-finale'))round3.setFixed({immediate:true});
@@ -3655,6 +3677,12 @@
   }
 
   async function finishPractice() {
+    if(IS_N&&nGame){
+      if(practice.busy||state.done)return;practice.busy=true;route=null;
+      for(const b of shelf.values())b.visible=false;
+      try{await nGame.ending();await nGame.showReward();made.add('n-finale');practice.stage=6;state.done=true;save();updateWordCount();showDoneCard();}
+      finally{practice.busy=false;nGame.endDone();}return;
+    }
     if(IS_P){
       if(practice.busy||state.done)return;practice.busy=true;route=null;
       for(const b of shelf.values())b.visible=false;
@@ -3720,7 +3748,8 @@
     {const tgt=state.started&&!practice.busy&&!lesson.active&&!state.challenge?guideTarget():null;const calling=Boolean(tgt&&arc(tgt.dir,grandmaDir())<1.2);
      npcTag.classList.toggle('is-calling',calling);
      // 走到 NPC 身边（3 米内，NPC 站在台子上走不到更近、没在走路）就自动开始说话，不用再点名牌
-     if(calling&&!route&&arc(player.dir,grandmaDir())<3.1&&performance.now()>npcAutoAt){npcAutoAt=performance.now()+5000;grandmaTurn();}
+     if(IS_N&&nGame?.paused&&arc(player.dir,grandmaDir())>4)nGame.paused=false;
+     if(calling&&!(IS_N&&nGame?.paused)&&!route&&arc(player.dir,grandmaDir())<3.1&&performance.now()>npcAutoAt){npcAutoAt=performance.now()+5000;grandmaTurn();}
      // 名牌在画面里、NPC 也不远时，金色名牌就够了；名牌看不到或者 NPC 很远时，头顶的“！”从远处指路
      const top=orchard.granny.root.localToWorld(new V3(0,(PLANET.id === "i01" ? 3.8 : IS_P ? 2.6 : 2.4)+Math.abs(Math.sin(time*3))*.3,0)),cd=top.distanceTo(camera.position),far=arc(player.dir,grandmaDir())>14;
      npcCall.visible=calling&&cd>7&&(IS_I||IS_P||npcTag.hidden||far);
@@ -3758,7 +3787,7 @@
   function learnedLetters() {
     const set = new Set();
     for (const pl of Object.values(PLANETS)) {
-      if (pl.kind !== "letters" || !PLANET_ROUTE.includes(pl.id)) continue;
+      if (pl.kind !== "letters" || (!PLANET_ROUTE.includes(pl.id) && pl.id !== PREVIEW_PLANET)) continue;
       if (pl.id === PLANET.id) {
         for (const l of ORDER) if (crystals[l].collected) set.add(l);
       } else {
@@ -4179,6 +4208,7 @@
     routeTo,ready:()=>state.started,free:()=>!learningNow()&&!pGame?.popActive,stopRoute:()=>{route=null},cameraShot:v=>{camShot=v},crystal:()=>crystals[LETTER],activate:()=>activateLetter(LETTER,true),
     has:id=>made.has(id),mark:id=>{made.add(id);updateWordCount()},save:()=>save(),read:readStore,write:writeStore,stars:n=>addStars(n),trace:i=>courseTrace(i,[i===0?'upper':'lower']),playWord:w=>playWord(w),say:(h,o)=>say(h,o)
   }):null;
+  const nGame=IS_N&&window.YayaNGame?YayaNGame.create({THREE,world:round3,tween,wait,sfx,LOW_POWER,read:readStore,write:writeStore,stopSpeech:interruptSpeech,stopRoute:()=>{route=null;playerMoving=false;},say:(h,o)=>say(h,o),stars:n=>addStars(n),has:id=>made.has(id),mark:id=>{made.add(id);updateWordCount()},save:()=>save(),playWord:w=>playWord(w),cameraShot:v=>{camShot=v}}):null;
 
   // ---------- 点击与拖动 ----------
   const pickRay = new THREE.Raycaster();
@@ -4195,6 +4225,7 @@
   function handleTap(clientX, clientY) {
     if (!state.started) return;
     initAudio();
+    if(nGame?.locked)return;
     if(pGame?.locked){pGame.tap(clientX,clientY);return;}
     if(IS_P&&(practice.busy||lesson.active))return;
     if(iGame?.riding){iGame.tapSide(clientX<innerWidth/2);return;}
@@ -4410,7 +4441,7 @@
       }
       return;
     }
-    if(iGame?.locked||pGame?.locked){if(pGame?.riding&&pointer.drag&&!pointer.pBlow)pGame.orbitCamera?.((e.clientX-pointer.lastX)*0.007);pointer.lastX=e.clientX;return;}
+    if(iGame?.locked||pGame?.locked||nGame?.locked){if(pGame?.riding&&pointer.drag&&!pointer.pBlow)pGame.orbitCamera?.((e.clientX-pointer.lastX)*0.007);pointer.lastX=e.clientX;return;}
     if (pointer.drag) {
       camYawDelta += (e.clientX - pointer.lastX) * 0.007;
       camFwdTarget = null;
@@ -4451,13 +4482,13 @@
   // 缩放：滚轮，或两根手指捏合 / 张开。大世界可以拉远到看见整颗星球
   const CAM_MIN = 6, CAM_MAX = LARGE_WORLD ? (PLANET.id === "i01" ? 72 : 44) : 16;
   canvas.addEventListener("wheel", (e) => {
-    if(pGame?.locked)return;
+    if(pGame?.locked||nGame?.locked)return;
     camDist = THREE.MathUtils.clamp(camDist + e.deltaY * 0.02, CAM_MIN, CAM_MAX);
   }, { passive: true });
   const touches = new Map();
   let pinch = null;
   canvas.addEventListener("pointerdown", (e) => {
-    if (e.pointerType !== "touch" || pGame?.locked) return;
+    if (e.pointerType !== "touch" || pGame?.locked || nGame?.locked) return;
     touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (touches.size === 2) {
       const [a, b] = [...touches.values()];
@@ -4537,7 +4568,7 @@
     $("#planet-open").focus({ preventScroll: true });
   }
   function openPlanetMap() {
-    if (!state.started || traveling || iGame?.locked || pGame?.locked || ((IS_I||IS_P)&&practice.busy)) return;
+    if (!state.started || traveling || iGame?.locked || pGame?.locked || nGame?.locked || ((IS_I||IS_P)&&practice.busy)) return;
     if (lesson.active || state.challenge || state.digging || state.digPending || state.spelling || blend.word) {
       if (!mapBlockedReminderPending) {
         mapBlockedReminderPending = true;
@@ -4582,7 +4613,7 @@
   });
   $("#preview-badge").hidden = !PREVIEW_PLANET;
   async function travelTo(id) {
-    if (iGame?.locked || pGame?.locked || ((IS_I||IS_P)&&practice.busy) || traveling || lesson.active || state.challenge || state.digging || state.digPending || state.spelling || blend.word) return;
+    if (iGame?.locked || pGame?.locked || nGame?.locked || ((IS_I||IS_P)&&practice.busy) || traveling || lesson.active || state.challenge || state.digging || state.digPending || state.spelling || blend.word) return;
     if (id === PLANET.id) { closePlanetMap(); return; }
     if (!id || !playable(id)) {
       say("那颗星球还在建造中，以后再去吧。", { voice: "locked-planet" });
@@ -4663,10 +4694,12 @@
       writeStore("yaya-unicorn",null);
       writeStore("yaya-i-animal-friends",null);
       writeStore("yaya-p-activity",null);
+      writeStore("yaya-n-roll",null);
     } else {
       writeStore(SAVE_KEY, null);
       if(IS_I)writeStore("yaya-i-animal-friends",null);
       if(IS_P)writeStore("yaya-p-activity",null);
+      if(IS_N)writeStore("yaya-n-roll",null);
     }
   }
 
@@ -4769,6 +4802,7 @@
         ? ["欢迎回来！回到石台那里，我们接着拼词。", "go-altar"]
         : ["欢迎回来！跟着金色光点，继续学字母。", "welcome-letters"];
     }
+    if (IS_N && state.done) return [YAYA_VOICE_LINES["n01-welcome-last"], "n01-welcome-last"];
     if (state.done && !PLANET.next) return [YAYA_VOICE_LINES["welcome-last"], "welcome-last"];
     if (state.done) return ["欢迎回来！你的小伙伴们都还在这里。点一点天上发光的星球，就能飞过去。", "welcome-done"];
     const useful = altar.slots.length ? usefulLetter() : null;
@@ -4821,7 +4855,7 @@
   });
 
   // 调试入口：在控制台里可以直接操作
-  window.__yaya = {get unicorn(){return unicornGuide},iGame,pGame,camera,player,guideTarget:()=>guideTarget(),routeTo:(d,s)=>routeTo(d,s),get tRace(){return tRace},setCamShot:v=>{camShot=v},get snakeRide(){return snakeRide},get state(){return state},get farPlanets(){return farPlanets},round3,camYaw:(a)=>{camYawDelta+=a;},navigation,obstacles,props,R,WALK_SPEED,START_DIR,arc,moveAlong,tangent,getRoute:()=>route,runCourseBlend,runIslandRace, courseTurn,runCourseGame,runWordCard,courseTrace,get companionUI(){return companionUI;},petLedger, habitat, get profileUI(){return profileUI;}, changeAvatar, practice, runApple, runWords, grandmaTurn, initPractice, orchard, traceLetter, speakers, listeningHit, traceBothCases, unicornGuide, tracePaths: TRACE, storageKeys: {progress:storageKey(PROGRESS_KEY), stars:storageKey(STAR_KEY), planet:storageKey(SAVE_KEY), namespace:STORE_PREFIX}, getLearnedLetters: () => [...learnedLetters()], planetUnlocked, secondRewards, scene, clouds, surfaceRadius, wildlife, artVersion: "v55-consistent", camera, swipe, blendWord, hitAnswer, makeLetterQuiz, screenPoint, getAnswers: () => answers, getCameraForward: () => camFwd.toArray(), fieldStars, addStars, starBank, PLANET, pets, travelTo, showDoneCard, lesson, blend, runLesson, blendPick, STAGE, state, crystals, player, placed, altar, made, routeTo, startChallenge, placeLetter, pickUpLetter, spawnAltar, syncBag, dirFrom, save, checkSpelling, makeWord, sound, sfx, bell, startMusic, renderer, getPixelRatio: () => pixelRatio };
+  window.__yaya = {get unicorn(){return unicornGuide},iGame,pGame,nGame,digHit:c=>digHit(c),get practice(){return practice},get made(){return made},camera,player,guideTarget:()=>guideTarget(),routeTo:(d,s)=>routeTo(d,s),get tRace(){return tRace},setCamShot:v=>{camShot=v},get snakeRide(){return snakeRide},get state(){return state},get farPlanets(){return farPlanets},round3,camYaw:(a)=>{camYawDelta+=a;},navigation,obstacles,props,R,WALK_SPEED,START_DIR,arc,moveAlong,tangent,getRoute:()=>route,runCourseBlend,runIslandRace, courseTurn,runCourseGame,runWordCard,courseTrace,get companionUI(){return companionUI;},petLedger, habitat, get profileUI(){return profileUI;}, changeAvatar, practice, runApple, runWords, grandmaTurn, initPractice, orchard, traceLetter, speakers, listeningHit, traceBothCases, unicornGuide, tracePaths: TRACE, storageKeys: {progress:storageKey(PROGRESS_KEY), stars:storageKey(STAR_KEY), planet:storageKey(SAVE_KEY), namespace:STORE_PREFIX}, getLearnedLetters: () => [...learnedLetters()], planetUnlocked, secondRewards, scene, clouds, surfaceRadius, wildlife, artVersion: "v55-consistent", camera, swipe, blendWord, hitAnswer, makeLetterQuiz, screenPoint, getAnswers: () => answers, getCameraForward: () => camFwd.toArray(), fieldStars, addStars, starBank, PLANET, pets, travelTo, showDoneCard, lesson, blend, runLesson, blendPick, STAGE, state, crystals, player, placed, altar, made, routeTo, startChallenge, placeLetter, pickUpLetter, spawnAltar, syncBag, dirFrom, save, checkSpelling, makeWord, sound, sfx, bell, startMusic, renderer, getPixelRatio: () => pixelRatio };
 
   const arriving = (() => {
     try {
@@ -4843,11 +4877,11 @@
   const companionUI=YayaCompanion.create({THREE,renderer,ledger:petLedger,guide:unicornGuide,profile:profileUI,say,quiet:()=>performance.now()-voice.at>8000,onBalance:showStarCount,point:screenPoint,busy:()=>!state.started||lesson.active||practice.busy||state.spelling||!!state.challenge||!!state.digging||!$("#task-card").hidden});
   startButton.textContent = arriving ? "走下飞船" : savedGame ? "继续冒险" : "降落到小星球";
   async function showTurtleArrival(){
-    const overview = (PLANET.id === "i01" || PLANET.id === "t01" || IS_P) ? round3?.turtle?.overview : null;
-    const arrivalKey = PLANET.id === "i01" ? "yaya-globe-arrival" : IS_P ? "yaya-bubble-arrival" : "yaya-turtle-arrival";
+    const overview = (PLANET.id === "i01" || PLANET.id === "t01" || IS_P || PLANET.id === "n01") ? round3?.turtle?.overview : null;
+    const arrivalKey = PLANET.id === "i01" ? "yaya-globe-arrival" : IS_P ? "yaya-bubble-arrival" : PLANET.id === "n01" ? "yaya-nest-arrival" : "yaya-turtle-arrival";
     if(!overview || readStore(arrivalKey))return;
     const wasBusy=practice.busy,cloudsWereVisible=clouds.visible;practice.busy=true;camBoost=1;clouds.visible=false;
-    const veil=document.createElement('div');veil.id='turtle-arrival';veil.setAttribute('aria-label',PLANET.id === 'i01' ? '第一次降落：雪花玻璃球全景' : IS_P ? '第一次降落：泡泡星球全景' : '第一次降落：海龟岛全景');
+    const veil=document.createElement('div');veil.id='turtle-arrival';veil.setAttribute('aria-label',PLANET.id === 'i01' ? '第一次降落：雪花玻璃球全景' : IS_P ? '第一次降落：泡泡星球全景' : IS_N ? '第一次降落：月亮鸟巢星球全景' : '第一次降落：海龟岛全景');
     Object.assign(veil.style,{position:'fixed',inset:'0',zIndex:'35',touchAction:'none'});document.body.append(veil);document.body.classList.add('turtle-arriving');
     const shot=overview(camera.aspect);camShot=shot;updateCamera(0,true);
     try{
@@ -5085,7 +5119,7 @@
   let pingTimer = 1.5;
   // 正在学习互动（上课、描字母、听音选、拼词、单词卡、喂蛇、赛跑、和 NPC 说话）时，引路的叮叮声和“我在这里等你”都不出声，免得和发音混在一起
   const learningNow = () => lesson.active || !lessonEl.hidden || state.challenge || state.digging || state.digPending || state.spelling || blend.active || blend.word
-    || practice.busy || !!snakeRide?.active || !!tRace?.active || !!iGame?.locked || !!pGame?.locked || swipe.active;
+    || practice.busy || !!snakeRide?.active || !!tRace?.active || !!iGame?.locked || !!pGame?.locked || !!nGame?.locked || swipe.active;
   if(IS_P){
     round3.bubbles.block(()=>!state.started||learningNow()||pGame?.popActive||companionUI.open||!$("#planet-map").hidden||!$("#done").hidden);
     round3.bubbles.onPop(n=>{if(n%3===1&&performance.now()-voice.at>1800)say('噗！',{voice:'p01-sky-pop'});});
@@ -5161,7 +5195,7 @@
     STAGE.stars.forEach((star, i) => { star.material.emissiveIntensity = 0.52 + 0.06 * Math.sin(time * 1.6 + i); });
     for (const pet of Object.values(pets)) updatePet(pet, dt);
     if(!iGame?.riding&&!pGame?.riding)player.mixer.update(dt);
-    pGame?.update(dt,time);
+    pGame?.update(dt,time);nGame?.update(dt,time);
     for (const pet of Object.values(pets)) pet.mixer.update(dt);
     updateCamera(dt);
     updateAnswers(time);
