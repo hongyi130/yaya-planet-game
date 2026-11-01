@@ -4,3 +4,7 @@ Object.assign(window.YAYA_VOICE_LINES,{"meaning-igloo": "就是冰屋。", "mean
 
 /* User-approved pup audition, 2026-11-01. Keep the original af_heart voice. */
 window.YAYA_ASSETS["audio/pup.m4a"] = "planet-p-audio/audio/pup.b562fe4120a298fc.m4a";
+
+/* Complete two silent guide hints using the original Chinese reference voice. */
+Object.assign(window.YAYA_ASSETS,{"voice/ui-visit-crystal.m4a": "audio/guide/ui-visit-crystal.5f3b12b1d0af4e33.m4a", "voice/ui-finish-step.m4a": "audio/guide/ui-finish-step.84ec41d2095badf3.m4a"});
+Object.assign(window.YAYA_VOICE_LINES,{"ui-visit-crystal": "沿着小路，去听听这颗水晶。", "ui-finish-step": "先完成这一小步，再去看看其他星球吧。"});

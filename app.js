@@ -2054,8 +2054,11 @@
   function visitAnswer(block) {
     if(block.userData.disabled||state.digPending)return;
     if(LARGE_WORLD && arc(player.dir,block.userData.dir)>1.75) {
-      routeTo(block.userData.dir,1.45,()=>hitAnswer(block));
-      say("沿着小路，去听听这颗水晶。",{interrupt:true});
+      const challenge = state.challenge;
+      routeTo(block.userData.dir,1.45,()=>enqueueSpeech(()=>{
+        if (state.challenge === challenge && answers.includes(block)) hitAnswer(block);
+      }));
+      say("沿着小路，去听听这颗水晶。",{voice:"ui-visit-crystal",interrupt:true});
     } else {route=null;hitAnswer(block);}
   }
   function updateAnswerTrail() {
@@ -4526,6 +4529,7 @@
 
   // ---------- 星际旅行：存好进度，镜头拉远飞走，刷新后在新星球降落 ----------
   let traveling = false;
+  let mapBlockedReminderPending = false;
   let camBoost = 1;
   function closePlanetMap() {
     $("#planet-map").hidden = true;
@@ -4535,7 +4539,11 @@
   function openPlanetMap() {
     if (!state.started || traveling || iGame?.locked || pGame?.locked || ((IS_I||IS_P)&&practice.busy)) return;
     if (lesson.active || state.challenge || state.digging || state.digPending || state.spelling || blend.word) {
-      say("先完成这一小步，再去看看其他星球吧。");
+      if (!mapBlockedReminderPending) {
+        mapBlockedReminderPending = true;
+        say("先完成这一小步，再去看看其他星球吧。", {voice:"ui-finish-step"})
+          .finally(() => { mapBlockedReminderPending = false; });
+      }
       return;
     }
     route = null;
